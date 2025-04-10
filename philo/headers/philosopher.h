@@ -9,8 +9,11 @@
 /*   Updated: 2024/11/08 17:54:18 by ferda-si         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include "ft_printf.h"
+#include <sys/time.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <pthread.h>
 
 void ft_check_args_quant(int ac);
 long	ft_atoi(const char *str);

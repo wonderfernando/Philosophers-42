@@ -1,3 +1,8 @@
+void	data()
+{
+	
+}
+
 long	ft_atoi(const char *str)
 {
 	int				mod;
