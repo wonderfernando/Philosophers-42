@@ -15,7 +15,7 @@ FILES = src/main.c src/check_args.c src/utils.c
 OBJS = $(FILES:src/%.c=objs/%.o)
 
 CFLAGS          = -Wall -Werror -Wextra
-NAME = philo
+NAME = phil
 
 PRINTF = ft_printf/libftprintf.a
 OBJS_PATH = objs/
