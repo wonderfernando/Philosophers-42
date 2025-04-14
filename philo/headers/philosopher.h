@@ -37,6 +37,8 @@ typedef struct s_philo {
    t_fork *left_fork;
    t_fork *right_fork;
    t_data *data;
+   long long last_meal;
+   
 } t_philo;
 
 
