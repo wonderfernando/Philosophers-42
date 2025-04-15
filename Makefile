@@ -10,31 +10,31 @@
 #                                                                              #
 # **************************************************************************** #
 
-FILES = src/src/main.c src/src/check_args.c src/src/utils.c
+FILES = philo/src/main.c philo/src/check_args.c philo/src/utils.c
 
-OBJS = $(FILES:src/src/%.c=src/objs/%.o)
+OBJS = $(FILES:philo/src/%.c=philo/objs/%.o)
 
 CFLAGS          = -Wall -Werror -Wextra
-NAME = philo
+NAME = Philosophers
 
-OBJS_PATH = src/objs/
-FILES_PATH = src/src/
+OBJS_PATH = philo/objs/
+FILES_PATH = philo/src/
 
 all: $(NAME) $(OBJS)
 
 $(NAME): $(OBJS)
-	cc $(CFLAGS) -I src/headers  $(OBJS) -o $(NAME)
+	cc $(CFLAGS) -I philo/headers  $(OBJS) -o $(NAME)
 
 $(OBJS_PATH)%.o: $(FILES_PATH)%.c
-	@mkdir -p src/objs
-	cc $(CFLAGS) -I src/headers -c $< -o $@
+	@mkdir -p philo/objs
+	cc $(CFLAGS) -I philo/headers -c $< -o $@
 
 clean:
 	rm -f $(OBJS)
 	rm -rf $(OBJS_PATH)
 
 fclean: clean
-	 
+	rm -f $(NAME)
 	rm -rf $(OBJS_PATH)
 
 re: fclean clean all
