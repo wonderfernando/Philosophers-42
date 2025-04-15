@@ -55,7 +55,9 @@ void init_philos(t_data *data)
 		philo[i].right_fork = &data->fork[(i + 1) % data->number_philos];
 		philo[i].last_meal = data->start_time;
 		philo[i].data = data;
+		philo[i].count_mealded = 0;
 		pthread_mutex_init(&philo[i].last_meal_mutex, NULL);
+		pthread_mutex_init(&philo[i].meal_mutex, NULL);
 		i++;
 	}
 	data->philo = philo;
@@ -79,13 +81,14 @@ void eat(t_philo *philo)
 		ft_usleep(1);
 	pthread_mutex_lock(&philo->left_fork->mutex);
 	print(philo, "has taken a fork");
-	// printf("%lld %d has taken a fork \n", get_current_time(), philo->id);
 	pthread_mutex_lock(&philo->right_fork->mutex);
 	print(philo, "has taken a fork");
 	print(philo, "is eating");
-	// printf("%lld %d has taken a fork \n", get_current_time(), philo->id);
 	// printf("%lld %d is eating \n", get_current_time(), philo->id);
 	ft_usleep(philo->data->time_to_eat);
+	pthread_mutex_lock(&philo->meal_mutex);
+	philo->count_mealded++;
+	pthread_mutex_unlock(&philo->meal_mutex);
 	pthread_mutex_lock(&philo->last_meal_mutex);
 	philo->last_meal = get_current_time();
 	pthread_mutex_unlock(&philo->last_meal_mutex);
@@ -123,6 +126,7 @@ void *routine_philosopher(void *dt)
 		think(philo);
 		ft_usleep(1);
 	}
+	
 	return NULL;
 }
 
@@ -152,21 +156,51 @@ void *is_dead_th(void *dt)
 			pthread_mutex_unlock(&data->philo[i].last_meal_mutex);
 			i++;
 		}
+		if (data->number_must_eat > 0)
+        {
+            i = 0;
+            int all_ate_enough = 1;
+            while (i < data->number_philos)
+            {
+                pthread_mutex_lock(&data->philo[i].meal_mutex);
+                if (data->philo[i].count_mealded < data->number_must_eat)
+                    all_ate_enough = 0;
+                pthread_mutex_unlock(&data->philo[i].meal_mutex);
+                i++;
+            }
+            if (all_ate_enough)
+            {
+                pthread_mutex_lock(&data->someone_died_mutex);
+                data->someone_died = 1; // Para a simulação
+                pthread_mutex_unlock(&data->someone_died_mutex);
+                return NULL;
+            }
+        }
 		ft_usleep(600);
 	}
 	return NULL;
 }
-void start_simulation(t_data *data)
+int start_simulation(t_data *data)
 {
 	int i;
 
 	i = 0;
+	if (data->number_philos == 1)
+	{
+		print(&data->philo[0], "has taken a fork");
+		ft_usleep(data->time_to_die);
+		printf("%lld %d died\n", get_current_time(), data->philo[0].id);
+		data->someone_died = 1;
+		return (0);
+	}
+
 	while (i < data->number_philos)
 	{
 		pthread_create(&data->philo[i].thread, NULL, routine_philosopher, &data->philo[i]);
 		i++;
 	}
 	pthread_create(&data->thread_monitoring, NULL, is_dead_th, data);
+	return (1);
 }
 
 void waintg_threads(t_data *data)
@@ -181,9 +215,7 @@ void waintg_threads(t_data *data)
 	}
 	pthread_join(data->thread_monitoring, NULL);
 }
-/* number_of_philosophers time_to_die time_to_eat time_to_sleep
-[number_of_times_each_philosopher_must_eat]
- */
+
 void init_data(t_data *data, int ac, char **av)
 {
 	data->number_philos = ft_atoi(av[1]);
@@ -202,7 +234,6 @@ void init_data(t_data *data, int ac, char **av)
 
 int main(int ac, char **av)
 {
-	// t_philo *philo = NULL;
 	t_data data;
 
 	ft_check_args_quant(ac);
@@ -211,9 +242,9 @@ int main(int ac, char **av)
 	init_data(&data, ac, av);
 	init_forks(&data);
 	init_philos(&data);
-	start_simulation(&data);
-	waintg_threads(&data);
-	// routine
-	// monitoring
+	if (start_simulation(&data))
+	{
+		waintg_threads(&data);
+	}
 	exit(0);
 }

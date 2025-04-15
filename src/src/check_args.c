@@ -4,7 +4,7 @@ void ft_check_args_quant(int ac)
 {
     if (ac != 5 && ac != 6)
     {
-        printf("ERRO: NUMEROS DE ARGUMENTOS INVÁLIDOS");
+        printf("ERRO: NUMEROS DE ARGUMENTOS INVÁLIDOS\n");
         exit(1);
     }
 
@@ -18,7 +18,7 @@ int	ft_isdigit(int c)
 
 int	ft_isdigit_str(char *str)
 {
-	while (*str == '+' || *str == '-')
+	while (*str == '+')
 		str++;
 	while (*str)
 	{
@@ -38,7 +38,7 @@ void check_valid_numbers(char **str)
     {
         if (!ft_isdigit_str(str[i]))
         {
-            printf("ERRO: NUMEROS INVÁLIDOS");
+            printf("ERRO: NUMEROS INVÁLIDOS\n");
             exit(1);
         }
         i++;
@@ -57,12 +57,12 @@ void    check_philo_number(char **str)
         number = ft_atoi(str[i]);
         if ((number > 200 && i == 1) || (i == 1 && number < 1))
         {
-            printf("ERRO: NÃO DEVE HAVER MAIS DE 200 PHILOSOPHERS NEM MENOS DE 1");
+            printf("ERRO: NÃO DEVE HAVER MAIS DE 200 PHILOSOPHERS NEM MENOS DE 1\n");
             exit(1);
         }
         else if (i != 5 && number < 1)
         {
-            printf("ERRO: ARGUMENTOS ERRADOS");
+            printf("ERRO: ARGUMENTOS ERRADOS\n");
             exit(1);
         }
         i++;
