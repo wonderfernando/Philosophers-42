@@ -1,12 +1,5 @@
 #include "philosopher.h"
 
-t_data *get_data()
-{
-	static t_data *data_str = NULL;
-	if (data_str == NULL)
-		data_str = (t_data *)malloc(sizeof(t_data));
-	return (data_str);
-}
 
 long long get_current_time()
 {
@@ -71,7 +64,8 @@ void print(t_philo *philo, char *str)
 		pthread_mutex_unlock(&philo->data->someone_died_mutex);
 		return ;
 	}
-	printf("%lld %d %s\n", get_current_time(), philo->id, str);
+	
+	printf("%lld %d %s %d\n", get_current_time(), philo->id, str, philo->data->someone_died);
 	pthread_mutex_unlock(&philo->data->someone_died_mutex);
 }
 
@@ -84,7 +78,6 @@ void eat(t_philo *philo)
 	pthread_mutex_lock(&philo->right_fork->mutex);
 	print(philo, "has taken a fork");
 	print(philo, "is eating");
-	// printf("%lld %d is eating \n", get_current_time(), philo->id);
 	ft_usleep(philo->data->time_to_eat);
 	pthread_mutex_lock(&philo->meal_mutex);
 	philo->count_mealded++;
@@ -124,7 +117,7 @@ void *routine_philosopher(void *dt)
 		eat(philo);
 		sleep_philo(philo);
 		think(philo);
-		ft_usleep(1);
+		ft_usleep(10);
 	}
 	
 	return NULL;
@@ -170,13 +163,13 @@ void *is_dead_th(void *dt)
             }
             if (all_ate_enough)
             {
-                pthread_mutex_lock(&data->someone_died_mutex);
+			     pthread_mutex_lock(&data->someone_died_mutex);
                 data->someone_died = 1; // Para a simulação
                 pthread_mutex_unlock(&data->someone_died_mutex);
                 return NULL;
             }
         }
-		ft_usleep(600);
+		ft_usleep(1);
 	}
 	return NULL;
 }
@@ -246,5 +239,6 @@ int main(int ac, char **av)
 	{
 		waintg_threads(&data);
 	}
+	printf("%d\n", data.someone_died);
 	exit(0);
 }
